@@ -3,7 +3,7 @@
 #include <pebble.h>
 
 #define MAX_CLOSEST_STATIONS 5
-#define MAX_TRAINS 8
+#define MAX_TRAINS 20
 #define TEXT_TINY 12
 #define TEXT_SHORT 24
 #define TEXT_MEDIUM 40

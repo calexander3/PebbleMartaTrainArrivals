@@ -1,5 +1,5 @@
 const MAX_CLOSEST = 5;
-const MAX_TRAINS = 8;
+const MAX_TRAINS = 20;
 
 function sendReady() {
   send({ READY: 1 });
