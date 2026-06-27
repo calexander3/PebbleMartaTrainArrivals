@@ -137,17 +137,31 @@ function stationRows(stationIndex) {
   const station = stations[stationIndex];
   if (!station) return [];
 
-  return trainRows
-    .filter(
-      (train) => normalizeStation(train.station) === station.normalizedApiName
-    )
-    .sort((a, b) => a.waitingSeconds - b.waitingSeconds)
-    .map((train) => ({
-      line: train.line,
-      direction: train.direction,
-      destination: shortenString(train.destination),
-      wait: shortenString(train.wait),
-    }));
+  const rows = takeNextTwoPerDestination(
+    trainRows
+      .filter(
+        (train) => normalizeStation(train.station) === station.normalizedApiName
+      )
+      .sort((a, b) => a.waitingSeconds - b.waitingSeconds)
+  ).map((train) => ({
+    line: train.line,
+    direction: train.direction,
+    destination: shortenString(train.destination),
+    wait: shortenString(train.wait),
+  }));
+
+  return rows;
+}
+
+function takeNextTwoPerDestination(trains) {
+  const destinationCounts = {};
+
+  return trains.filter((train) => {
+    const destination = normalizeStation(train.destination);
+    destinationCounts[destination] = (destinationCounts[destination] || 0) + 1;
+
+    return destinationCounts[destination] <= 2;
+  });
 }
 
 function shortenString(str) {
