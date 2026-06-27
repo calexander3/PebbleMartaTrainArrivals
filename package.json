@@ -1,7 +1,7 @@
 {
   "name": "marta-next-train",
   "author": "Craig Alexander",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "keywords": [
     "Marta",
     "Atlanta",
@@ -145,6 +145,12 @@
           "name": "IMAGE_APP_LOGO",
           "file": "images/AppLogoBW.png",
           "menuIcon": true
+        },
+        {
+          "type": "font",
+          "name": "FONT_ROBOTO_MONO_BOLD_24",
+          "file": "fonts/RobotoMono-Bold.ttf",
+          "characterRegex": "^[NSEW]$"
         }
       ]
     }

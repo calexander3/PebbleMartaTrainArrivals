@@ -42,6 +42,7 @@ extern Window *s_station_window;
 extern Layer *s_station_layer;
 extern ScrollLayer *s_train_scroll_layer;
 extern Layer *s_train_content_layer;
+extern GFont s_train_direction_font;
 extern TrainRow s_trains[MAX_TRAINS];
 extern int s_train_count;
 extern char s_last_updated[TEXT_MEDIUM];

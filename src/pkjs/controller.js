@@ -168,6 +168,7 @@ function shortenString(str) {
   return str
     .replace("Hamilton E.", "H E")
     .replace("North", "N")
+    .replace("Creek", "Crk")
     .replace("Lindbergh Center", "Lindbergh");
 }
 

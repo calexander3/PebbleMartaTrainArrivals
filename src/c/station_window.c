@@ -4,14 +4,18 @@
 #define TRAIN_ROW_SIZE 28
 #define TRAIN_ROW_FONT FONT_KEY_GOTHIC_28
 #define TRAIN_ROW_FONT_BOLD FONT_KEY_GOTHIC_28_BOLD
+#define TRAIN_DIR_FALLBACK_FONT FONT_KEY_GOTHIC_24_BOLD
 #define TRAIN_WAIT_WIDTH 64
 #define TRAIN_DIR_WIDTH 24
+#define TRAIN_DIR_Y_OFFSET 4
 #else
 #define TRAIN_ROW_SIZE 25
 #define TRAIN_ROW_FONT FONT_KEY_GOTHIC_24
 #define TRAIN_ROW_FONT_BOLD FONT_KEY_GOTHIC_24_BOLD
+#define TRAIN_DIR_FALLBACK_FONT FONT_KEY_GOTHIC_24_BOLD
 #define TRAIN_WAIT_WIDTH 50
 #define TRAIN_DIR_WIDTH 15
+#define TRAIN_DIR_Y_OFFSET 0
 #endif
 
 static void draw_text(GContext *ctx, const char *text, GFont font, GRect rect,
@@ -25,6 +29,15 @@ static void station_select_click_handler(ClickRecognizerRef recognizer, void *co
   if (s_selected_station >= 0) {
     send_command("REFRESH", s_selected_station, true);
   }
+}
+
+static GFont train_direction_font(void) {
+#if defined(PBL_PLATFORM_EMERY) || defined(PBL_PLATFORM_GABBRO)
+  return s_train_direction_font ? s_train_direction_font
+                                : fonts_get_system_font(TRAIN_DIR_FALLBACK_FONT);
+#else
+  return fonts_get_system_font(TRAIN_DIR_FALLBACK_FONT);
+#endif
 }
 
 static void station_click_config_provider(void *context) {
@@ -76,6 +89,11 @@ static void station_window_unload(Window *window) {
 }
 
 void station_window_init(void) {
+#if defined(PBL_PLATFORM_EMERY) || defined(PBL_PLATFORM_GABBRO)
+  s_train_direction_font =
+    fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_MONO_BOLD_24));
+#endif
+
   s_station_window = window_create();
   window_set_background_color(s_station_window, marta_black());
   window_set_window_handlers(s_station_window,
@@ -91,6 +109,10 @@ void station_window_deinit(void) {
   if (s_station_window) {
     window_destroy(s_station_window);
     s_station_window = NULL;
+  }
+  if (s_train_direction_font) {
+    fonts_unload_custom_font(s_train_direction_font);
+    s_train_direction_font = NULL;
   }
 }
 
@@ -195,9 +217,11 @@ void train_content_update_proc(Layer *layer, GContext *ctx) {
     int heading_x = line_x + TRAIN_DIR_WIDTH;
     int wait_x = bounds.size.w - wait_width - 2 - info_offset;
     int heading_width = wait_x - heading_x;
+    int direction_y = row_position + TRAIN_DIR_Y_OFFSET;
 
-    draw_text(ctx, s_trains[i].direction, fonts_get_system_font(TRAIN_ROW_FONT_BOLD),
-              GRect(line_x, row_position, TRAIN_DIR_WIDTH, row_size), GTextAlignmentLeft,
+    draw_text(ctx, s_trains[i].direction, train_direction_font(),
+              GRect(line_x, direction_y, TRAIN_DIR_WIDTH, row_size - TRAIN_DIR_Y_OFFSET),
+              GTextAlignmentCenter,
               marta_line_color(s_trains[i].line));
     draw_text(ctx, s_trains[i].destination, fonts_get_system_font(TRAIN_ROW_FONT),
               GRect(heading_x, row_position, heading_width, row_size), GTextAlignmentLeft,

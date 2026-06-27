@@ -13,6 +13,7 @@ Window *s_station_window;
 Layer *s_station_layer;
 ScrollLayer *s_train_scroll_layer;
 Layer *s_train_content_layer;
+GFont s_train_direction_font;
 TrainRow s_trains[MAX_TRAINS];
 int s_train_count;
 char s_last_updated[TEXT_MEDIUM];

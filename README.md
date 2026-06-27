@@ -17,6 +17,15 @@ MARTA_API_KEY=your_marta_api_key_here
 
 `npm run build` generates `src/pkjs/generated-config.js` from `.env`.
 
+For local testing when trains are not running, add this to `.env` and rebuild:
+
+```sh
+MARTA_USE_EXAMPLE_RESPONSE=true
+```
+
+That makes PKJS return `example-api-response.json` instead of calling the live
+MARTA API.
+
 ## Building & running
 
 ```sh

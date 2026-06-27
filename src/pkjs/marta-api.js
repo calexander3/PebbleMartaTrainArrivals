@@ -1,10 +1,17 @@
-const { MARTA_API_KEY } = require("./generated-config");
+const { MARTA_API_KEY, MARTA_EXAMPLE_RESPONSE } = require("./generated-config");
 const { requestJson } = require("./http");
 
 const endpoint =
   "https://developerservices.itsmarta.com:18096/itsmarta/railrealtimearrivals/developerservices/traindata";
 
 function getTrainData(station) {
+  if (MARTA_EXAMPLE_RESPONSE) {
+    console.log("using example MARTA response");
+    return Promise.resolve(JSON.parse(MARTA_EXAMPLE_RESPONSE)).then(
+      normalizeRows
+    );
+  }
+
   if (!MARTA_API_KEY) {
     return Promise.reject(new Error("MARTA_API_KEY is not set"));
   }
