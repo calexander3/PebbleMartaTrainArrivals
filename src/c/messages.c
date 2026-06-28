@@ -12,8 +12,9 @@ bool send_command(const char *command, int32_t index, bool include_index) {
     return false;
   }
 
+  int32_t request_id = s_request_id++;
   dict_write_cstring(iter, MESSAGE_KEY_COMMAND, command);
-  dict_write_int32(iter, MESSAGE_KEY_REQUEST_ID, s_request_id++);
+  dict_write_int32(iter, MESSAGE_KEY_REQUEST_ID, request_id);
   if (include_index) {
     dict_write_int32(iter, MESSAGE_KEY_INDEX, index);
   }
@@ -106,6 +107,17 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context) {
   if (dict_find(iter, MESSAGE_KEY_READY)) {
     s_phone_ready = true;
     request_initial_state();
+    return;
+  }
+
+  Tuple *request_tuple = dict_find(iter, MESSAGE_KEY_REQUEST_ID);
+  if (request_tuple && request_tuple->type == TUPLE_INT) {
+    int32_t response_request_id = request_tuple->value->int32;
+    if (response_request_id < s_latest_response_request_id) {
+      APP_LOG(APP_LOG_LEVEL_INFO, "ignoring stale response: %ld", (long)response_request_id);
+      return;
+    }
+    s_latest_response_request_id = response_request_id;
   }
 
   Tuple *screen_tuple = dict_find(iter, MESSAGE_KEY_SCREEN);

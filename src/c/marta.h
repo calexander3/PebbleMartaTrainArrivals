@@ -34,6 +34,7 @@ extern MenuLayer *s_menu_layer;
 extern MenuMode s_menu_mode;
 extern bool s_phone_ready;
 extern int32_t s_request_id;
+extern int32_t s_latest_response_request_id;
 extern int s_closest_indices[MAX_CLOSEST_STATIONS];
 extern char s_closest_distances[MAX_CLOSEST_STATIONS][TEXT_SHORT];
 extern int s_closest_count;

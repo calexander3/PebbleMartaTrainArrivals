@@ -5,6 +5,7 @@ MenuLayer *s_menu_layer;
 MenuMode s_menu_mode = MENU_MODE_LOADING;
 bool s_phone_ready;
 int32_t s_request_id = 1;
+int32_t s_latest_response_request_id;
 int s_closest_indices[MAX_CLOSEST_STATIONS];
 char s_closest_distances[MAX_CLOSEST_STATIONS][TEXT_SHORT];
 int s_closest_count;

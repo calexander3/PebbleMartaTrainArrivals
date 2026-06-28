@@ -5,23 +5,29 @@ function sendReady() {
   send({ READY: 1 });
 }
 
-function sendLoadingMenu() {
-  send({
-    SCREEN: "menu",
-    MENU_KIND: "loading",
-    MENU_COUNT: 0,
-  });
+function sendLoadingMenu(requestId) {
+  send(
+    {
+      SCREEN: "menu",
+      MENU_KIND: "loading",
+      MENU_COUNT: 0,
+    },
+    requestId
+  );
 }
 
-function sendAllStationsMenu() {
-  send({
-    SCREEN: "menu",
-    MENU_KIND: "all",
-    MENU_COUNT: 0,
-  });
+function sendAllStationsMenu(requestId) {
+  send(
+    {
+      SCREEN: "menu",
+      MENU_KIND: "all",
+      MENU_COUNT: 0,
+    },
+    requestId
+  );
 }
 
-function sendClosestStationsMenu(stations) {
+function sendClosestStationsMenu(stations, requestId) {
   const message = {
     SCREEN: "menu",
     MENU_KIND: "closest",
@@ -33,10 +39,10 @@ function sendClosestStationsMenu(stations) {
     message["CLOSEST_" + index + "_DISTANCE"] = station.distanceText || "";
   });
 
-  send(message);
+  send(message, requestId);
 }
 
-function sendStation(stationIndex, trains, lastUpdated, error) {
+function sendStation(stationIndex, trains, lastUpdated, error, requestId) {
   const rows = trains.slice(0, MAX_TRAINS);
   const message = {
     SCREEN: "station",
@@ -53,10 +59,14 @@ function sendStation(stationIndex, trains, lastUpdated, error) {
     message["TRAIN_" + index + "_WAIT"] = train.wait;
   });
 
-  send(message, "station rows=" + rows.length);
+  send(message, requestId, "station rows=" + rows.length);
 }
 
-function send(message, label) {
+function send(message, requestId, label) {
+  if (requestId !== undefined && requestId !== null) {
+    message.REQUEST_ID = Number(requestId);
+  }
+
   Pebble.sendAppMessage(
     message,
     function () {},

@@ -24,32 +24,36 @@ function start() {
 function handleCommand(payload) {
   const command = payload.COMMAND;
   const index = Number(payload.INDEX);
+  const requestId =
+    payload.REQUEST_ID !== undefined && payload.REQUEST_ID !== null
+      ? Number(payload.REQUEST_ID)
+      : null;
   console.log("watch command: " + JSON.stringify(payload));
 
   if (command === "INIT") {
-    sendCurrentMenu();
+    sendCurrentMenu(requestId);
     if (selectedStationIndex >= 0) {
-      sendSelectedStation();
+      sendSelectedStation(requestId);
     }
   } else if (command === "SELECT_STATION") {
     selectedStationIndex = index;
     if (lastUpdated) {
-      sendSelectedStation();
+      sendSelectedStation(requestId);
     }
-    refreshTrainData();
+    refreshTrainData(requestId);
   } else if (command === "REFRESH") {
     if (!Number.isNaN(index)) {
       selectedStationIndex = index;
     }
-    refreshTrainData();
+    refreshTrainData(requestId);
   }
 }
 
-function sendCurrentMenu() {
+function sendCurrentMenu(requestId) {
   if (closestStations.length > 0) {
-    watch.sendClosestStationsMenu(closestStations);
+    watch.sendClosestStationsMenu(closestStations, requestId);
   } else {
-    watch.sendLoadingMenu();
+    watch.sendLoadingMenu(requestId);
   }
 }
 
@@ -83,9 +87,12 @@ function refreshLocation() {
     });
 }
 
-function refreshTrainData() {
+function refreshTrainData(requestId) {
   const selectedStation = stations[selectedStationIndex];
   if (refreshInFlight) {
+    if (selectedStationIndex >= 0 && lastUpdated) {
+      sendSelectedStation(requestId);
+    }
     return;
   }
   refreshInFlight = true;
@@ -98,7 +105,7 @@ function refreshTrainData() {
       lastUpdated = Math.floor(Date.now() / 1000);
       console.log("train refresh rows=" + trainRows.length);
       if (selectedStationIndex >= 0) {
-        sendSelectedStation();
+        sendSelectedStation(requestId);
       }
     })
     .catch((error) => {
@@ -110,13 +117,14 @@ function refreshTrainData() {
           selectedStationIndex,
           cachedRows,
           lastUpdated,
-          "error"
+          "error",
+          requestId
         );
       }
     });
 }
 
-function sendSelectedStation() {
+function sendSelectedStation(requestId) {
   if (selectedStationIndex < 0 || selectedStationIndex >= stations.length) {
     return;
   }
@@ -130,7 +138,7 @@ function sendSelectedStation() {
       " updated=" +
       lastUpdated
   );
-  watch.sendStation(selectedStationIndex, rows, lastUpdated, "");
+  watch.sendStation(selectedStationIndex, rows, lastUpdated, "", requestId);
 }
 
 function stationRows(stationIndex) {
